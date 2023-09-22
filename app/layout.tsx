@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import RecoilProvider from "./recoilProvider";
+import { NextScript } from "next/document";
 
 export const metadata: Metadata = {
   title: "Trello 2.0",

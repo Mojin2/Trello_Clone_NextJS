@@ -6,5 +6,9 @@ export default function RecoilProvider({
 }: {
   children: React.ReactNode;
 }) {
-  return <RecoilRoot>{children}</RecoilRoot>;
+  return (
+    <>
+      <RecoilRoot>{children}</RecoilRoot>
+    </>
+  );
 }

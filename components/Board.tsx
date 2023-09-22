@@ -4,109 +4,95 @@ import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 import Columns from "./Columns";
 import { useRecoilState } from "recoil";
-import { columnsState } from "@/app/atom";
+import { columnsState, IToDoState } from "@/app/atom";
 
-const ColumnsArray: Column[] = [
+const ColumnsArraytmp: Column[] = [
   {
     id: "todoColumn",
     todos: [
-      { title: "1", status: "todo", id: "1todo" },
-      { title: "2", status: "todo", id: "2todo" },
+      { title: "1", status: "todo", id: "1" },
+      { title: "2", status: "todo", id: "2" },
     ],
   },
   {
     id: "inprogressColumn",
     todos: [
-      { title: "3", status: "inprogress", id: "1inprogress" },
-      { title: "4", status: "inprogress", id: "2inprogress" },
+      { title: "3", status: "inprogress", id: "3" },
+      { title: "4", status: "inprogress", id: "4" },
     ],
   },
   {
     id: "doneColumn",
     todos: [
-      { title: "5", status: "done", id: "1done" },
-      { title: "6", status: "done", id: "2done" },
+      { title: "5", status: "done", id: "5" },
+      { title: "6", status: "done", id: "6" },
     ],
   },
 ];
 function Board() {
   // Recoil Hydration Issue
   const [recoilColumnsArray, setColumnsArray] = useRecoilState(columnsState);
-  // const [ColumnsArray, setClientColumnsArray] = useState<Column[]>([]);
-  const [winReady, setwindReady] = useState(false);
+  const [ColumnsArray, setClientColumnsArray] = useState<IToDoState>({});
   useEffect(() => {
-    setwindReady(true);
-    // setClientColumnsArray(recoilColumnsArray);
-    // get Board if use DB
+    setClientColumnsArray(recoilColumnsArray);
   }, [recoilColumnsArray]);
   const handleOnDragEnd = (result: DropResult) => {
-    const { destination, source, type } = result;
+    const { draggableId, destination, source, type } = result;
 
     // Check if use dragged card outside of board
     if (!destination) return;
-    // console.log(source);
-    // console.log(destination);
-    // console.log(type);
     // Handle column drag
     if (type === "column") {
-      // when use Recoil //
-      // setColumnsArray((columns) => {
-      //   const columnCopy = [...columns];
-      //   const [sourceColumn] = columnCopy.splice(source.index, 1);
-      //   columnCopy.splice(destination.index, 0, sourceColumn);
-      //   return columnCopy;
-      // });
-      const [sourceColumn] = ColumnsArray.splice(source.index, 1);
-      ColumnsArray.splice(destination.index, 0, sourceColumn);
+      setColumnsArray((columns) => {
+        const obj = Object.entries(columns);
+        const [target] = obj.splice(source.index, 1);
+        obj.splice(destination.index, 0, target);
+        const main = Object.fromEntries(obj);
+        return main;
+      });
     }
     if (type === "card") {
-      if (source.droppableId === destination.droppableId) {
-        const [sourceTodoColumn] = ColumnsArray.filter(
-          (items) => items.id === source.droppableId
-        );
-        const sourceTodo = sourceTodoColumn.todos[source.index];
-        const [Arr] = ColumnsArray.filter(
-          (items) => items.id === source.droppableId
-        );
-        Arr.todos.splice(source.index, 1);
-        Arr.todos.splice(destination.index, 0, sourceTodo);
+      if (destination.droppableId === source.droppableId) {
+        setColumnsArray((oldTodos) => {
+          const todoCopy = [...oldTodos[source.droppableId]];
+          todoCopy.splice(source.index, 1);
+          todoCopy.splice(destination.index, 0, draggableId);
+          return { ...oldTodos, [source.droppableId]: todoCopy };
+        });
       }
-      if (source.droppableId !== destination.droppableId) {
-        const [sourceTodoColumn] = ColumnsArray.filter(
-          (items) => items.id === source.droppableId
-        );
-        const sourceTodo = sourceTodoColumn.todos[source.index];
-        const [sourceArr] = ColumnsArray.filter(
-          (items) => items.id === source.droppableId
-        );
-        sourceArr.todos.splice(source.index, 1);
-        const [destinationArr] = ColumnsArray.filter(
-          (items) => items.id === destination.droppableId
-        );
-        destinationArr.todos.splice(destination.index, 0, sourceTodo);
+      if (destination.droppableId !== source.droppableId) {
+        setColumnsArray((oldToDos) => {
+          const sourceCopy = [...oldToDos[source.droppableId]];
+          const desCopy = [...oldToDos[destination.droppableId]];
+          sourceCopy.splice(source.index, 1);
+          desCopy.splice(destination?.index, 0, draggableId);
+          return {
+            ...oldToDos,
+            [source.droppableId]: sourceCopy,
+            [destination.droppableId]: desCopy,
+          };
+        });
       }
     }
   };
   return (
     <DragDropContext onDragEnd={handleOnDragEnd}>
       <Droppable droppableId="board" direction="horizontal" type="column">
-        {(provided) => (
+        {(provided, snapshot) => (
           <div
             className="grid grid-cols-1 md:grid-cols-3 max-w-7xl mx-auto gap-5"
             {...provided.droppableProps}
             ref={provided.innerRef}
           >
             {/* rendering all the columns */}
-            {winReady
-              ? ColumnsArray.map((column, index) => (
-                  <Columns
-                    id={column.id}
-                    index={index}
-                    todos={column.todos}
-                    key={column.id}
-                  />
-                ))
-              : null}
+            {Object.keys(ColumnsArray).map((columnId, index) => (
+              <Columns
+                id={columnId}
+                index={index}
+                todos={ColumnsArray[columnId]}
+                key={columnId}
+              />
+            ))}
             {provided.placeholder}
           </div>
         )}
