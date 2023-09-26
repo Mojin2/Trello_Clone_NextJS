@@ -1,5 +1,5 @@
 "use client";
-import { searchState } from "@/app/atom";
+import { modalState, searchState } from "@/app/atom";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 import React from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
@@ -25,6 +25,8 @@ const idToColumnText: { [key in TypedColumn]: string } = {
 };
 function Columns({ id, index, todos }: Props) {
   const [searchString, setSearchString] = useRecoilState(searchState);
+  const [isOpen, setIsOpen] = useRecoilState(modalState);
+
   return (
     <Draggable draggableId={id} index={index}>
       {(provided) => (
@@ -71,7 +73,7 @@ function Columns({ id, index, todos }: Props) {
                             {...provided.draggableProps}
                             ref={provided.innerRef}
                           >
-                            <TodoCard todo={todo} index={index} />
+                            <TodoCard id={id} todo={todo} index={index} />
                           </div>
                         )}
                       </Draggable>
@@ -79,7 +81,10 @@ function Columns({ id, index, todos }: Props) {
                   })}
                   {provided.placeholder}
                   <div className="flex items-end justify-end p-2">
-                    <button className="text-green-500 hover:text-green-600">
+                    <button
+                      onClick={() => setIsOpen(true)}
+                      className="text-green-500 hover:text-green-600"
+                    >
                       <PlusCircleIcon className="h-10 w-10 " />
                     </button>
                   </div>

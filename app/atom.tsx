@@ -3,17 +3,6 @@
 import { recoilPersist } from "recoil-persist";
 import { atom } from "recoil";
 
-interface Column {
-  id: string;
-  todos: Todo[];
-}
-
-interface Todo {
-  id: string;
-  title: string;
-  status: TypedColumn;
-}
-
 const localStorage =
   typeof window !== "undefined" ? window.localStorage : undefined;
 
@@ -21,34 +10,6 @@ const { persistAtom } = recoilPersist({
   key: "recoil-persist",
   storage: localStorage,
 });
-
-// export const columnsState = atom<Column[]>({
-//   key: "toDos",
-//   default: [
-//     {
-//       id: "todoColumn",
-//       todos: [
-//         { title: "1", status: "todo", id: "1" },
-//         { title: "2", status: "todo", id: "2" },
-//       ],
-//     },
-//     {
-//       id: "inprogressColumn",
-//       todos: [
-//         { title: "3", status: "inprogress", id: "3" },
-//         { title: "4", status: "inprogress", id: "4" },
-//       ],
-//     },
-//     {
-//       id: "doneColumn",
-//       todos: [
-//         { title: "5", status: "done", id: "5" },
-//         { title: "6", status: "done", id: "6" },
-//       ],
-//     },
-//   ],
-//   effects_UNSTABLE: [persistAtom],
-// });
 
 export interface IToDoState {
   [key: string]: string[];
@@ -66,4 +27,19 @@ export const columnsState = atom<IToDoState>({
 export const searchState = atom<string>({
   key: "search",
   default: "",
+});
+
+export const modalState = atom<boolean>({
+  key: "modal",
+  default: false,
+});
+
+export const newTaskState = atom<string>({
+  key: "newTaskState",
+  default: "",
+});
+
+export const newTaskTypeState = atom<string>({
+  key: "newTaskType",
+  default: "ToDo",
 });

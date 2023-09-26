@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import RecoilProvider from "./recoilProvider";
 import { NextScript } from "next/document";
+import Modal from "@/components/Modal";
 
 export const metadata: Metadata = {
   title: "Trello 2.0",
@@ -16,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <RecoilProvider>
-        <body className="bg-[#F5F6F8]">{children}</body>
+        <body className="bg-[#F5F6F8]">
+          {children}
+          <Modal />
+        </body>
       </RecoilProvider>
     </html>
   );
