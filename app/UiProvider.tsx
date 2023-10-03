@@ -1,16 +1,15 @@
 "use client";
 import { CacheProvider } from "@chakra-ui/next-js";
 import { ChakraProvider } from "@chakra-ui/react";
-import { RecoilRoot } from "recoil";
 
-export default function RecoilProvider({
+export default function UiProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <RecoilRoot>{children}</RecoilRoot>
-    </>
+    <CacheProvider>
+      <ChakraProvider>{children}</ChakraProvider>
+    </CacheProvider>
   );
 }

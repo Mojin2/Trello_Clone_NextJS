@@ -4,51 +4,39 @@ import { Dialog, Transition } from "@headlessui/react";
 import { useRecoilState } from "recoil";
 import {
   columnsState,
+  editIndexState,
+  editModalState,
   IToDoState,
-  modalState,
-  newTaskState,
-  newTaskTypeState,
 } from "@/app/atom";
 import TaskTypeRadioGroup from "./TaskTypeRadioGroup";
-import { useToast } from "@chakra-ui/react";
 
-function Modal() {
+function EditModal() {
   //   let [isOpen, setIsOpen] = useState(true);
-  const [isOpen, setIsOpen] = useRecoilState(modalState);
-  const [newTaskInput, setNewTaskInput] = useRecoilState(newTaskState);
+  const [isEditOpen, setEditIsOpen] = useRecoilState(editModalState);
   const [recoilColumnsArray, setColumnsArray] = useRecoilState(columnsState);
   const [ColumnsArray, setClientColumnsArray] = useState<IToDoState>({});
-  const [newTaskType, setNewTaskType] = useRecoilState(newTaskTypeState);
-  const [mounted, setMounted] = useState(false);
+  const [tmpName, setTmpName] = useState("");
+  const [editIndex, setEditIndex] = useRecoilState(editIndexState);
 
-  const statuses = ["success", "error", "warning", "info"];
-  const toast = useToast();
-
-  useEffect(() => {
-    setClientColumnsArray(recoilColumnsArray);
-  }, [recoilColumnsArray]);
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!newTaskInput) return;
-
-    //  add task
     setColumnsArray((oldTodos) => {
-      const todoCopy = [...oldTodos[newTaskType]];
-      todoCopy.push(newTaskInput);
-      return { ...oldTodos, [newTaskType]: todoCopy };
+      const todoCopy = [...Object.entries(oldTodos)];
+      todoCopy[editIndex][0] = tmpName;
+
+      return Object.fromEntries(todoCopy);
     });
-    setIsOpen(false);
-    setNewTaskInput("");
-    setMounted(true);
+    setEditIsOpen(false);
+    setTmpName("");
   };
   return (
     // Use the `Transition` component at the root level
-    <Transition appear show={isOpen} as={Fragment}>
+    <Transition appear show={isEditOpen} as={Fragment}>
       <Dialog
         as="form"
         onSubmit={handleSubmit}
         className="relative z-10"
-        onClose={() => setIsOpen(false)}
+        onClose={() => setEditIsOpen(false)}
       >
         {/*
           Use one Transition.Child to apply one transition to the backdrop...
@@ -85,39 +73,27 @@ function Modal() {
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900 pb-2"
                 >
-                  Add a Task
+                  Edit Title
                 </Dialog.Title>
 
                 <div className="mt-2">
                   <input
                     type="text"
-                    value={newTaskInput}
-                    onChange={(e) => setNewTaskInput(e.target.value)}
-                    placeholder="Enter a task here..."
-                    className="w-full border border-gray-300 rounded-md outline-none p-5"
+                    value={tmpName}
+                    onChange={(e) => setTmpName(e.target.value)}
+                    placeholder="Enter a new title here..."
+                    className="w-full border border-gray-300 rounded-md outline-none p-3"
                   />
                 </div>
-
-                {/* RadioGroup */}
-                <TaskTypeRadioGroup />
 
                 {/* Add button */}
                 <div>
                   <button
-                    onClick={() =>
-                      toast({
-                        title: "Todo created.",
-                        description: "We've created your Todo.",
-                        status: "success",
-                        duration: 3000,
-                        isClosable: true,
-                      })
-                    }
                     type="submit"
-                    disabled={!newTaskInput}
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed"
+                    disabled={!tmpName}
+                    className="mt-3 inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed"
                   >
-                    Add Task
+                    Edit
                   </button>
                 </div>
                 {/* file input */}
@@ -130,4 +106,4 @@ function Modal() {
   );
 }
 
-export default Modal;
+export default EditModal;

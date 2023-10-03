@@ -7,7 +7,6 @@ import { useRecoilState } from "recoil";
 import { searchState } from "@/app/atom";
 function Header() {
   const [searchString, setSearchString] = useRecoilState(searchState);
-  console.log(searchString);
   return (
     <header>
       <div className="flex flex-col md:flex-row items-center p-5 bg-gray-500/10 rounded-b-2xl">

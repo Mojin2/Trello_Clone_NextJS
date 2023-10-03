@@ -34,6 +34,11 @@ export const modalState = atom<boolean>({
   default: false,
 });
 
+export const editModalState = atom<boolean>({
+  key: "editModal",
+  default: false,
+});
+
 export const newTaskState = atom<string>({
   key: "newTaskState",
   default: "",
@@ -42,4 +47,14 @@ export const newTaskState = atom<string>({
 export const newTaskTypeState = atom<string>({
   key: "newTaskType",
   default: "ToDo",
+});
+
+export const editState = atom<boolean>({
+  key: "edit",
+  default: false,
+});
+
+export const editIndexState = atom<number>({
+  key: "editIndex",
+  default: 0,
 });
